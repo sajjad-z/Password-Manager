@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using MaterialDesignThemes.Wpf;
 using Models;
@@ -21,9 +22,9 @@ namespace Password_Manager
     /// </summary>
     public partial class MainWindow : Window
     {
-        DataBase<tbl_Password> dbPassword = new DataBase<tbl_Password>();
-        DataBase<tbl_Setting> dbSetting = new DataBase<tbl_Setting>();
-        Toaster _Toaster = new Toaster();
+        DataBase<tbl_Password> dbPassword;
+        DataBase<tbl_Setting> dbSetting;
+        Toaster _Toaster;
         int _PassId = 0;
 
         public MainWindow()
@@ -34,6 +35,12 @@ namespace Password_Manager
             this.Width = Properties.Settings.Default.lastWidth;
             this.Height = Properties.Settings.Default.lastHeight;
 
+            // first Init
+            dbPassword = new DataBase<tbl_Password>();
+            dbSetting = new DataBase<tbl_Setting>();
+            _Toaster = new Toaster();
+
+            isProtectionEnable();
             loadData();
             loadSetting();
 
@@ -44,6 +51,23 @@ namespace Password_Manager
             comboColor.ItemsSource = Enum.GetValues(typeof(card.myColors)).Cast<card.myColors>();
             // set default Value
             comboColor.SelectedIndex = 0;
+        }
+
+        // display login page or not
+        private void isProtectionEnable()
+        {
+            try
+            {
+                if (dbSetting.Select(1).isLock)
+                {
+                    loginControl.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    loginControl.Visibility = Visibility.Collapsed;
+                }
+            }
+            catch { }
         }
 
         // load passwords data from db in wrapPnael
@@ -65,24 +89,45 @@ namespace Password_Manager
         void loadSetting()
         {
             tbl_Setting setting = dbSetting.Select(1);
-            if (setting != null)
+            if (setting == null)
             {
-                toggleDark.IsChecked = setting.isDark;
-                toggleProtection.IsChecked = setting.isLock;
+                setting = new tbl_Setting()
+                {
+                    id = 1,
+                    isDark = false,
+                    isLock = false,
+                    password = "",
+                    username = "admin"
+                };
+                dbSetting.Insert(setting);
+            }
+            toggleDark.IsChecked = setting.isDark;
+            toggleProtection.IsChecked = setting.isLock;
+
+            // set Dark ui 
+            if (setting.isDark)
+            {
+                titleBar.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3A4047"));
+                mainGrid.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#282E33"));
+                minimizeIcon.Foreground = maximizeIcon.Foreground = closeIcon.Foreground = new SolidColorBrush(Colors.White);
+
+                cardSetting.Style = cardAdd.Style = cardShow.Style = (Style)Application.Current.Resources["customCardDark"];
+            }
+            // set Light ui 
+            else
+            {
+                titleBar.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F1F1F1"));
+                mainGrid.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
+                minimizeIcon.Foreground = maximizeIcon.Foreground = closeIcon.Foreground = new SolidColorBrush(Colors.DimGray);
+
+                cardSetting.Style = cardAdd.Style = cardShow.Style = (Style)Application.Current.Resources["customCardLight"];
             }
         }
 
         private void MyCard_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            menuShow_Click(null, null);
             _PassId = (int)(((card)sender).Tag);
-
-            //tbl_Password password = dbPassword.Select((int)(((card)sender).Tag));
-            //lblTitle.Text = password.name;
-            //lblPassword.Text = password.password;
-            //lblUsername.Text = password.username;
-            //lblDesc.Text = password.description;
-            //btnDelete.Tag = password.id;
+            menuShow_Click(null, null);
         }
 
         // reset all filed
@@ -202,11 +247,17 @@ namespace Password_Manager
 
             if (_PassId != 0)
             {
+                lblDesc.Visibility = lblUsername.Visibility = lblPassword.Visibility = lblTitle.Visibility = btnDelete.Visibility = btnEdit.Visibility = Visibility.Visible;
+
                 tbl_Password password = dbPassword.Select(_PassId);
                 lblTitle.Text = password.name;
                 lblPassword.Text = password.password;
                 lblUsername.Text = password.username;
                 lblDesc.Text = password.description;
+            }
+            else
+            {
+                lblDesc.Visibility = lblUsername.Visibility = lblPassword.Visibility = lblTitle.Visibility = btnDelete.Visibility = btnEdit.Visibility = Visibility.Hidden;
             }
         }
 
@@ -224,14 +275,6 @@ namespace Password_Manager
         private void menuShow_Click(object sender, RoutedEventArgs e)
         {
             runAnimation(cardShow);
-            if (_PassId == 0)
-            {
-                lblDesc.Visibility = lblUsername.Visibility = lblPassword.Visibility = lblTitle.Visibility = btnDelete.Visibility = btnEdit.Visibility = Visibility.Hidden;
-            }
-            else
-            {
-                lblDesc.Visibility = lblUsername.Visibility = lblPassword.Visibility = lblTitle.Visibility = btnDelete.Visibility = btnEdit.Visibility = Visibility.Visible;
-            }
         }
         #endregion
 
@@ -309,12 +352,13 @@ namespace Password_Manager
 
                 dbSetting.Update(setting);
             }
+            loadSetting();
         }
 
         // delete a password from db
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (dbPassword.Delete((int)((Button)sender).Tag))
+            if (dbPassword.Delete(_PassId))
             {
                 _PassId = 0;
                 menuShow_Click(null, null);
@@ -328,6 +372,12 @@ namespace Password_Manager
         }
 
         private void btnEdit_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        // change display type (row/tiles)
+        void changeDisplay()
         {
 
         }
@@ -351,6 +401,27 @@ namespace Password_Manager
             Properties.Settings.Default.Save();
         }
 
+        private void loginControl_LoginClick(object sender, RoutedEventArgs e)
+        {
+            if ((dbSetting.Select(1).password ?? loginControl.txtPass.Text) == loginControl.txtPass.Text)
+            {
+                // End of Animation for login user control
+                DoubleAnimation animation = new DoubleAnimation();
+                animation.From = loginControl.ActualHeight;
+                animation.To = 0;
+                animation.Duration = new Duration(TimeSpan.FromMilliseconds(200));
+                animation.Completed += Animation_Completed; ;
+                loginControl.BeginAnimation(HeightProperty, animation);
+            }
+            else
+            {
+                alertMessage("Wrong", "Password Is Not Valid", ToastTypes.Error);
+            }
+        }
 
+        private void Animation_Completed(object sender, EventArgs e)
+        {
+            loginControl.Visibility = Visibility.Collapsed;
+        }
     }
 }

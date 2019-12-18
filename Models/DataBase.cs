@@ -13,7 +13,7 @@ namespace Models
         public DataBase()
         {
             // Open database (or create if not exits)
-            db = new LiteDatabase(@"MyDB.db");
+            db = new LiteDatabase(System.AppDomain.CurrentDomain.BaseDirectory + @"MyDB.db");
 
             // Get table collection
             if (typeof(TEntity) == typeof(tbl_Password))

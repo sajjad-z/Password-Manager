@@ -28,20 +28,21 @@
     </WindowChrome.WindowChrome>
 
 
-    <Grid Background="{StaticResource darkMain}">
+    <Grid x:Name="mainGrid" Background="{StaticResource darkMain}">
         <Grid.RowDefinitions>
             <RowDefinition Height="45"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" Background="{StaticResource darkSecond}" FlowDirection="RightToLeft" MouseDown="titleBar_MouseDown">
+
+        <StackPanel x:Name="titleBar" Orientation="Horizontal" Background="{StaticResource darkSecond}" FlowDirection="RightToLeft" MouseDown="titleBar_MouseDown">
             <Button Padding="5 0 5 0" Margin="10 0 10 0" Background="Transparent" BorderBrush="Transparent" Click="Exit_Click">
-                <materialDesign:PackIcon Kind="Shutdown" Width="24" Height="24" />
+                <materialDesign:PackIcon Kind="Shutdown" Name="closeIcon" Width="24" Height="24" />
             </Button>
             <Button Padding="5 0 5 0" Margin="0 0 10 0" Background="Transparent" BorderBrush="Transparent" Click="Maximized_Click">
-                <materialDesign:PackIcon Kind="WindowMaximize" Width="22" Height="22" />
+                <materialDesign:PackIcon Kind="WindowMaximize" Name="maximizeIcon" Width="22" Height="22" />
             </Button>
             <Button Padding="5 0 5 0" Background="Transparent" BorderBrush="Transparent"  Click="Minimize_Click">
-                <materialDesign:PackIcon Kind="Minus" Width="24" Height="24"/>
+                <materialDesign:PackIcon Kind="Minus" Name="minimizeIcon" Width="24" Height="24"/>
             </Button>
         </StackPanel>
 
@@ -83,30 +84,53 @@
             <DockPanel Margin="10 10 10 0" Grid.RowSpan="2">
                 <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Right">
 
-                    <materialDesign:Card x:Name="cardShow" Visibility="Collapsed" Style="{StaticResource customCard}">
+                    <materialDesign:Card x:Name="cardShow" Visibility="Visible" Style="{StaticResource customCardDark}">
                         <StackPanel KeyboardNavigation.TabNavigation="Cycle">
-                            <TextBlock x:Name="lblTitle" Style="{DynamicResource MaterialDesignTitleTextBlock}" Margin="0 5 0 0" TextAlignment="Center" Text="Title" />
-                            <TextBlock x:Name="lblUsername" Style="{DynamicResource MaterialDesignTitleTextBlock}" Margin="0 5 0 0" TextAlignment="Center" Text="Title" />
-                            <TextBlock x:Name="lblPassword" Style="{DynamicResource MaterialDesignTitleTextBlock}" Margin="0 5 0 0" TextAlignment="Center" Text="Title" />
-                            <TextBlock x:Name="lblDesc" Style="{DynamicResource MaterialDesignTitleTextBlock}" Margin="0 5 0 0" TextAlignment="Center" Text="Title" />
 
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
+                            <TextBox x:Name="lblTitle" Style="{DynamicResource TextBoxReadOnly}" Margin="0 5 0 0" TextAlignment="Center" Text="Title" FontSize="20" TextWrapping="WrapWithOverflow"/>
 
-                                <Button Name="btnEdit" IsDefault="True" TabIndex="5" Click="btnEdit_Click" materialDesign:ButtonAssist.CornerRadius="15" Margin="8" >
-                                    <materialDesign:PackIcon Kind="Edit" Width="22" Height="22" />
+                            <Border BorderThickness="1" BorderBrush="Silver" CornerRadius="10" Padding="13 8 0 8" Margin="5">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="50"/>
+                                        <RowDefinition Height="50"/>
+                                    </Grid.RowDefinitions>
+
+                                    <materialDesign:PackIcon Kind="User" Width="22" Height="22" VerticalAlignment="Center"/>
+                                    <TextBox x:Name="lblUsername" Grid.Column="1" Style="{DynamicResource TextBoxReadOnly}" VerticalAlignment="Center" Margin="10 0 10 0" TextAlignment="Left" Text="User" />
+                                    <materialDesign:PackIcon Kind="Lock" Width="22" Height="22" Grid.Row="1" VerticalAlignment="Center"/>
+                                    <TextBox x:Name="lblPassword" Grid.Column="1" Grid.Row="1" Style="{DynamicResource TextBoxReadOnly}" VerticalAlignment="Center" Margin="10 0 10 0" TextAlignment="Left" Text="Pass" />
+                                </Grid>
+                            </Border>
+
+                            <Border BorderThickness="1" BorderBrush="Silver" CornerRadius="10" Padding="13 8 0 8" Margin="5">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <materialDesign:PackIcon Kind="Text" Width="22" Height="22" VerticalAlignment="Center"/>
+                                    <TextBox x:Name="lblDesc" Grid.Column="1" Style="{DynamicResource TextBoxReadOnly}" Margin="10 0 10 0" TextAlignment="Left" Text="Title" TextWrapping="Wrap" />
+                                </Grid>
+                            </Border>
+
+                            <StackPanel Orientation="Horizontal">
+                                <Button Name="btnEdit" Style="{StaticResource MaterialDesignFloatingActionDarkButton}" TabIndex="1" Click="btnEdit_Click" Margin="3" Height="50" Width="50">
+                                    <materialDesign:PackIcon Kind="Edit" Width="20" Height="20" />
                                 </Button>
-                                <Button Name="btnDelete" Grid.Column="1" TabIndex="6" Click="btnDelete_Click" materialDesign:ButtonAssist.CornerRadius="15" Margin="8" >
-                                    <materialDesign:PackIcon Kind="Delete" Width="22" Height="22" />
+                                <Button Name="btnDelete" Style="{StaticResource MaterialDesignFloatingActionButton}" TabIndex="2" Click="btnDelete_Click" Margin="5" Height="50" Width="50">
+                                    <materialDesign:PackIcon Kind="Delete" Width="20" Height="20" />
                                 </Button>
-                            </Grid>
+                            </StackPanel>
                         </StackPanel>
                     </materialDesign:Card>
 
-                    <materialDesign:Card x:Name="cardAdd" Visibility="Collapsed" Style="{StaticResource customCard}">
+                    <materialDesign:Card x:Name="cardAdd" Visibility="Collapsed" Style="{StaticResource customCardDark}">
                         <StackPanel KeyboardNavigation.TabNavigation="Cycle">
                             <TextBlock Style="{DynamicResource MaterialDesignTitleTextBlock}" Margin="0 5 0 0" TextAlignment="Center" Text="New Record" />
                             <TextBox x:Name="txtTitle" TabIndex="0" materialDesign:HintAssist.Hint="Title" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" />
@@ -118,7 +142,7 @@
                         </StackPanel>
                     </materialDesign:Card>
 
-                    <materialDesign:Card x:Name="cardSetting" Visibility="Collapsed" Style="{StaticResource customCard}">
+                    <materialDesign:Card x:Name="cardSetting" Visibility="Collapsed" Style="{StaticResource customCardDark}">
                         <StackPanel KeyboardNavigation.TabNavigation="Cycle">
                             <TextBlock Style="{DynamicResource MaterialDesignTitleTextBlock}" Margin="0 5 0 0" TextAlignment="Center" Text="Setting" />
                             <PasswordBox x:Name="passwordBox" TabIndex="0" materialDesign:HintAssist.Hint="New Password" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" Margin="8" />
@@ -170,6 +194,8 @@
 
             </DockPanel>
         </Grid>
+
+        <card:loginPage x:Name="loginControl" Visibility="Collapsed" KeyboardNavigation.TabNavigation="Cycle" Grid.Row="1" VerticalAlignment="Top" Height="{Binding ElementName=mainGrid,Path=ActualHeight}" LoginClick="loginControl_LoginClick" />
     </Grid>
 
 </Window>

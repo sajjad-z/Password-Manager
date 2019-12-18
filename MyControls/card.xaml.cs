@@ -63,7 +63,8 @@ namespace Password_Manager.MyControls
                 case myColors.Pink:
                     gradientStop1.Color = (Color)ColorConverter.ConvertFromString("#FF6086");
                     gradientStop1.Offset = 0;
-                    gradientStop2.Color = (Color)ColorConverter.ConvertFromString("#FF80A9");
+                    //gradientStop2.Color = (Color)ColorConverter.ConvertFromString("#FF80A9");
+                    gradientStop2.Color = (Color)ColorConverter.ConvertFromString("#ffa7c4");
                     gradientStop2.Offset = 0.8;
                     break;
                 case myColors.Purple:
@@ -73,9 +74,9 @@ namespace Password_Manager.MyControls
                     gradientStop2.Offset = 0.85;
                     break;
                 case myColors.Green:
-                    gradientStop1.Color = (Color)ColorConverter.ConvertFromString("#FF4BECB8");
+                    gradientStop1.Color = (Color)ColorConverter.ConvertFromString("#45D8CE");
                     gradientStop1.Offset = 0.048;
-                    gradientStop2.Color = (Color)ColorConverter.ConvertFromString("#45D8CE");
+                    gradientStop2.Color = (Color)ColorConverter.ConvertFromString("#FF4BECB8");
                     gradientStop2.Offset = 0.8;
                     break;
                 case myColors.Blue:
